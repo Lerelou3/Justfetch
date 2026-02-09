@@ -319,59 +319,6 @@ def get_shell():
     return shell
 
 @safe
-def get_packages():
-    """Count installed packages."""
-    if IS_WINDOWS or IS_MACOS: return None
-    
-    # Termux dpkg
-    prefix = os.environ.get("PREFIX")
-    if prefix:
-        termux_status = os.path.join(prefix, "var/lib/dpkg/status")
-        if os.path.exists(termux_status):
-            try:
-                count = 0
-                with open(termux_status, "r", encoding="utf-8", errors="ignore") as f:
-                    for line in f:
-                        if line.startswith("Package: "):
-                            count += 1
-                return f"{count} (dpkg)"
-            except: pass
-    
-    # Standard dpkg - FIX: Lire ligne par ligne au lieu de mmap
-    if os.path.exists("/var/lib/dpkg/status"):
-        try:
-            count = 0
-            with open("/var/lib/dpkg/status", "r", encoding="utf-8", errors="ignore") as f:
-                for line in f:
-                    if line.startswith("Package: "):
-                        count += 1
-            return f"{count} (dpkg)"
-        except: pass
-    
-    # Pacman
-    if os.path.exists("/var/lib/pacman/local"):
-        try:
-            # Exclure ALPM_DB_VERSION
-            count = len([d for d in os.listdir('/var/lib/pacman/local') if not d.startswith('ALPM')])
-            return f"{count} (pacman)"
-        except: pass
-    
-    # Alpine apk
-    if is_alpine():
-        for p in ("/lib/apk/db/installed", "/var/lib/apk/db/installed"):
-            if os.path.exists(p):
-                try:
-                    count = 0
-                    with open(p, "r", encoding="utf-8", errors="ignore") as f:
-                        for line in f:
-                            if line.startswith("P:"):
-                                count += 1
-                    return f"{count} (apk)"
-                except: break
-    
-    return None
-
-@safe
 def get_cpu():
     """CPU model."""
     cores = os.cpu_count()
@@ -638,6 +585,33 @@ def get_resolution():
                     res = line.split()[0]
                     return res
         except: pass
+    return None
+
+@safe
+def get_processes():
+    """Number of running processes."""
+    if IS_WINDOWS:
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['tasklist'], 
+                capture_output=True, 
+                text=True, 
+                timeout=0.5, 
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            # Chaque ligne = un processus (sauf les 3 premières lignes d'en-tête)
+            count = len(result.stdout.strip().split('\n')) - 3
+            return str(count) if count > 0 else None
+        except: 
+            pass
+    elif os.path.exists("/proc"):
+        try:
+            # Compter les dossiers numériques dans /proc (chaque PID = 1 processus)
+            count = sum(1 for d in os.listdir("/proc") if d.isdigit())
+            return str(count) if count > 0 else None
+        except: 
+            pass
     return None
 
 # ═══════════════════════════════════════════════════════════════════════════

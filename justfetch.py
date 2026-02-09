@@ -182,31 +182,104 @@ def get_os():
         
         return version_str
     
-    if is_termux(): return f"Android/Termux {rel}"
-    if is_alpine(): return f"Alpine {rel}"
-    if IS_MACOS: return f"macOS {platform.mac_ver()[0]}"
-    if IS_BSD: return f"{platform.system()} {rel.split('-')[0]}"
-    if is_wsl(): return f"{rel.split('-')[0]} (WSL2)"
+    if is_termux(): 
+        return f"Android/Termux {rel}"
+    
+    if is_alpine(): 
+        return f"Alpine {rel}"
+    
+    if IS_MACOS: 
+        return f"macOS {platform.mac_ver()[0]}"
+    
+    if IS_BSD: 
+        return f"{platform.system()} {rel.split('-')[0]}"
+    
+    # Linux - Lire /etc/os-release pour avoir le vrai nom (pas juste le kernel)
+    if os.path.exists("/etc/os-release"):
+        try:
+            os_info = {}
+            with open("/etc/os-release") as f:
+                for line in f:
+                    if '=' in line:
+                        key, value = line.strip().split('=', 1)
+                        os_info[key] = value.strip('"')
+            
+            # Utiliser PRETTY_NAME si disponible (ex: "Debian GNU/Linux 13 (trixie)")
+            # Sinon fallback sur NAME + VERSION
+            name = os_info.get("PRETTY_NAME")
+            if not name:
+                name = os_info.get("NAME", "Linux")
+                version = os_info.get("VERSION", "")
+                if version:
+                    name += f" {version}"
+            
+            # Ajouter (WSL2) si détecté
+            if is_wsl():
+                name += " (WSL2)"
+            
+            return name
+        except: 
+            pass
+    
+    # Fallback si /etc/os-release n'existe pas
+    if is_wsl(): 
+        return f"{rel.split('-')[0]} (WSL2)"
+    
     return rel.split("-")[0]
 
 @safe
-def get_processes():
-    """Number of running processes."""
-    if IS_WINDOWS:
+def get_packages():
+    """Installed package count."""
+    if IS_WINDOWS or IS_MACOS: return None
+    
+    # Termux dpkg
+    prefix = os.environ.get("PREFIX")
+    if prefix:
+        termux_status = os.path.join(prefix, "var/lib/dpkg/status")
+        if os.path.exists(termux_status):
+            try:
+                count = 0
+                with open(termux_status, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        if line.startswith("Package: "):
+                            count += 1
+                return f"{count} (dpkg)"
+            except: pass
+    
+    # Standard dpkg - FIX: Lire ligne par ligne
+    if os.path.exists("/var/lib/dpkg/status"):
         try:
-            import subprocess
-            result = subprocess.run(['tasklist'], capture_output=True, text=True, timeout=0.5, creationflags=subprocess.CREATE_NO_WINDOW)
-            # Chaque ligne = un processus (sauf les 3 premières lignes d'en-tête)
-            count = len(result.stdout.strip().split('\n')) - 3
-            return str(count)
+            count = 0
+            with open("/var/lib/dpkg/status", "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if line.startswith("Package: "):
+                        count += 1
+            return f"{count} (dpkg)"
         except: pass
-    elif os.path.exists("/proc"):
+    
+    # Pacman
+    if os.path.exists("/var/lib/pacman/local"):
         try:
-            # Compter les dossiers numériques dans /proc
-            count = sum(1 for d in os.listdir("/proc") if d.isdigit())
-            return str(count)
+            # Exclure le fichier ALPM_DB_VERSION qui n'est pas un paquet
+            count = len([d for d in os.listdir('/var/lib/pacman/local') if not d.startswith('ALPM')])
+            return f"{count} (pacman)"
         except: pass
+    
+    # Alpine apk
+    if is_alpine():
+        for p in ("/lib/apk/db/installed", "/var/lib/apk/db/installed"):
+            if os.path.exists(p):
+                try:
+                    count = 0
+                    with open(p, "r", encoding="utf-8", errors="ignore") as f:
+                        for line in f:
+                            if line.startswith("P:"):
+                                count += 1
+                    return f"{count} (apk)"
+                except: break
+    
     return None
+
 
 @safe
 def get_uptime():
@@ -247,7 +320,7 @@ def get_shell():
 
 @safe
 def get_packages():
-    """Installed package count."""
+    """Count installed packages."""
     if IS_WINDOWS or IS_MACOS: return None
     
     # Termux dpkg
@@ -256,35 +329,43 @@ def get_packages():
         termux_status = os.path.join(prefix, "var/lib/dpkg/status")
         if os.path.exists(termux_status):
             try:
-                with open(termux_status, "rb") as f:
-                    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
-                        count = sum(1 for _ in iter(lambda: mm.find(b"Package: ") != -1 and mm.seek(mm.tell() + 1), False))
-                        return f"{count} (dpkg)"
+                count = 0
+                with open(termux_status, "r", encoding="utf-8", errors="ignore") as f:
+                    for line in f:
+                        if line.startswith("Package: "):
+                            count += 1
+                return f"{count} (dpkg)"
             except: pass
     
-    # Standard dpkg
+    # Standard dpkg - FIX: Lire ligne par ligne au lieu de mmap
     if os.path.exists("/var/lib/dpkg/status"):
         try:
-            with open("/var/lib/dpkg/status", "rb") as f:
-                with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
-                    count = 0
-                    while mm.find(b"Package: ") != -1:
+            count = 0
+            with open("/var/lib/dpkg/status", "r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if line.startswith("Package: "):
                         count += 1
-                        mm.seek(mm.tell() + 1)
-                    return f"{count} (dpkg)"
+            return f"{count} (dpkg)"
         except: pass
     
     # Pacman
     if os.path.exists("/var/lib/pacman/local"):
-        return f"{len(os.listdir('/var/lib/pacman/local'))} (pacman)"
+        try:
+            # Exclure ALPM_DB_VERSION
+            count = len([d for d in os.listdir('/var/lib/pacman/local') if not d.startswith('ALPM')])
+            return f"{count} (pacman)"
+        except: pass
     
     # Alpine apk
     if is_alpine():
         for p in ("/lib/apk/db/installed", "/var/lib/apk/db/installed"):
             if os.path.exists(p):
                 try:
+                    count = 0
                     with open(p, "r", encoding="utf-8", errors="ignore") as f:
-                        count = sum(1 for line in f if line.startswith("P:"))
+                        for line in f:
+                            if line.startswith("P:"):
+                                count += 1
                     return f"{count} (apk)"
                 except: break
     

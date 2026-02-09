@@ -17,7 +17,7 @@
 -  **Comprehensive info** – CPU, RAM, disk, GPU, network, battery, temps, and more
 -  **Highly modular** – Easy to customize and extend
 
-## 📸 Screenshots
+## Screenshots
 
 ### Windows 11
 ```

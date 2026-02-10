@@ -22,41 +22,48 @@
 ### Windows 11
 ```
                               .oodMMMM   user@hostname
-                     .oodMMMMMMMMMMMMM   --------------
-         ..oodMMM  MMMMMMMMMMMMMMMMMMM   OS       Windows 11 Éducation (26100)
-   oodMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Uptime   17h 42m
+                     .oodMMMMMMMMMMMMM   ---------------------
+         ..oodMMM  MMMMMMMMMMMMMMMMMMM   OS       Windows 11 Famille (26200)        
+   oodMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Uptime   7m
    MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Shell    PowerShell
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Screen   1920x1080
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   CPU      20-core i5-14500
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   GPU      RTX 3050 Ti [4.0GB]
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   RAM      12355/32454MB [###-------]
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Disk     261.2/471.6GB (55%)
-                                         IP       192.168.1.42 (WAN: 203.0.113.55)
-   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Proc     280
-   
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Screen   1536x864
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   CPU      20-core 12th Gen   i7-12700H      
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Temp     GPU: 46°C
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Use      GPU: 0%
+                                         GPU      RTX 3050 Ti Laptop GPU [0.0/4.0GB]
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   RAM      12599/16088MB [#######--]
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Disk     456.1/475.7GB (95%)
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   IP       192.168.1.42 (WAN: 203.0.113.55)
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Batt     AC 100%
+   MMMMMMMMMMMMMM  MMMMMMMMMMMMMMMMMMM   Proc     289
+   `^^^^^^MMMMMMM  MMMMMMMMMMMMMMMMMMM
+         ````^^^^  ^^MMMMMMMMMMMMMMMMM               
+                        ````^^^^^^MMMM
+
    Fetch: 0.2541s
 ```
 
 ### Linux/WSL2
 ```
                                   user@hostname
-            a8888b.               --------------
-           d888888b.              OS       5.15.167.4 (WSL2)
-           8P"YP"Y88              Uptime   2d 5h 23m
+            a8888b.               ------------------
+           d888888b.              OS       Debian GNU/Linux 12 (bookworm) (WSL2)
+           8P"YP"Y88              Uptime   4m
            8|o||o|88              Shell    zsh
-           8'    .88              Pkgs     888 (dpkg)
-           8`._.' Y8.             CPU      20-core Intel i7-12700H
-          d/      `8b.            Temp     CPU: 55°C | GPU: 47°C
-         dP   .    Y8b.           Use      CPU: 12% | GPU: 5%
-        d8:'  "  `::88b           GPU      RTX 3050 Ti [0.5/4.0GB]
-       d8"         'Y88b          RAM      2641/7796MB (SW: 0MB) [###-------]
-      :8P    '      :888          Disk     48.0/1006.0GB (4%)
-       8a.   :     _a88P          IP       172.29.111.184
-     ._/"Yaa_:   .| 88P|          
-     \    YP"    `| 8P  `.        
-     /     \\.___.d|    .'         
-     `--..__)8888P`._.'           
-   
+           8'    .88              Screen   1920x1080
+           8`._.' Y8.             Pkgs     887 (dpkg)
+          d/      `8b.            CPU      20-core 12th Gen Intel Core i7-12700H
+         dP   .    Y8b.           Temp     GPU: 46°C
+        d8:'  "  `::88b           Use      CPU: 8% | GPU: 0%
+       d8"         'Y88b          GPU      RTX 3050 Ti Laptop GPU [0.0/4.0GB]
+      :8P    '      :888          RAM      2260/7796MB (SW: 0MB) [##-------]
+       8a.   :     _a88P          Disk     48.5/1006.9GB (4%)
+     ._/"Yaa_:   .| 88P|          IP       192.168.1.42 (WAN: 203.0.113.55)
+     \    YP"    `| 8P  `.        Batt     OK 100%
+     /     \.___.d|    .'         Proc     44
+     `--..__)8888P`._.'
+
+
    Fetch: 0.1523s
 ```
 

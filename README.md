@@ -73,20 +73,20 @@
 
 **Option 1: Download directly**
 ```bash
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/justfetch/main/justfetch.py
+curl -O https://raw.githubusercontent.com/Lerelou3/Justfetch/main/justfetch.py
 python3 justfetch.py
 ```
 
 **Option 2: Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/justfetch.git
-cd justfetch
+git clone https://github.com/Lerelou3/Justfetch.git
+cd Justfetch
 python3 justfetch.py
 ```
 
 **Option 3: Make it globally available (Linux/macOS/WSL)**
 ```bash
-sudo curl -o /usr/local/bin/justfetch https://raw.githubusercontent.com/YOUR_USERNAME/justfetch/main/justfetch.py
+sudo curl -o /usr/local/bin/justfetch https://raw.githubusercontent.com/Lerelou3/Justfetch/main/justfetch.py
 sudo chmod +x /usr/local/bin/justfetch
 justfetch
 ```
